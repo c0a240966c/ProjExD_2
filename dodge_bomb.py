@@ -152,9 +152,9 @@ def main():
         if not tate: #縦方向にはみ出ていたら
             vy *= -1
         
-        # if kk_rct.colliderect(bb_rct): #ゲームオーバー
-        #     gameover(screen)
-        #     return
+        if kk_rct.colliderect(bb_rct): #ゲームオーバー
+            gameover(screen)
+            return
         
         screen.blit(bb_img, bb_rct)
     
