@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+import time
 import pygame as pg
 
 
@@ -15,7 +16,7 @@ DELTA = { #移動量辞書
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
-    """
+    """ 
     引数:こうかとんRectまたは爆弾Rect
     戻り値:横方向, 縦方向の画面外判定結果
     画面内ならTrue, 画面外ならFalse
@@ -26,6 +27,32 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     if rct.top < 0 or rct.bottom > HEIGHT:
         tate = False
     return yoko, tate
+
+def gameover(screen: pg.Surface) -> None:
+    """
+    こうかとんが爆弾に当たった時のゲームオーバー画面を表示する関数
+
+    引数:
+        screen: Pygame画面Surface
+    """
+    # 半透明の黒い背景を表示
+    black = pg.Surface((WIDTH, HEIGHT))
+    black.set_alpha(200) #数値が高いほど透明度が低くなる
+    pg.draw.rect(black, (0, 0, 0), pg.Rect(0, 0, WIDTH, HEIGHT))  # 黒い四角を描画
+    screen.blit(black, (0, 0))  # 半透明の黒いSurfaceを画面に貼り付け
+
+    # 泣いているこうかとん画像を表示
+    kk_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 1.1)
+    kk_rct = kk_img.get_rect()
+    screen.blit(kk_img, (330, 300))
+    screen.blit(kk_img, (730, 300))
+    # 「Game Over」の文字を表示
+    font = pg.font.Font(None, 80) # フォントオブジェクトを作成（デフォルトフォント, サイズ80）
+    txt = font.render("Game Over", True, (255, 255, 255)) # テキストを白で描画
+    screen.blit(txt,(400, 300))
+
+    pg.display.update()
+    time.sleep(5) #時を5秒止める
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -64,10 +91,13 @@ def main():
             vx *= -1
         if not tate: #縦方向にはみ出ていたら
             vy *= -1
-        if kk_rct.colliderect(bb_rct):
-            return
-        screen.blit(bb_img, bb_rct)
         
+        if kk_rct.colliderect(bb_rct):
+            gameover(screen)
+            return
+        
+        screen.blit(bb_img, bb_rct)
+    
         pg.display.update()
         tmr += 1
         clock.tick(50)
