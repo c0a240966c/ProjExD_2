@@ -69,6 +69,38 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
         bb_imgs.append(bb_img)
         bb_accs.append(r)  # 加速度：1〜10
     return bb_imgs, bb_accs
+def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
+    """
+    移動量の合計値タプルに応じて画像を回転し、向きを変えたこうかとん画像を返す関数
+
+    引数:
+        sum_mv: 押下キーによる移動量の合計タプル (x, y)
+
+    戻り値:
+        回転済みのこうかとん画像Surface
+    """
+    base_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)  # 基本画像を読み込み
+
+    direction_to_angle = {
+        (-5, -5): -45,
+        (0, -5):  -90,
+        (+5, -5): -45,
+        (-5, 0):  180,
+        (0, 0):     0,
+        (+5, 0):    0,     # → 右を向くように変更（反転不要）
+        (-5, +5): -135,
+        (0, +5):  90,
+        (+5, +5): -135
+    }
+
+    angle = direction_to_angle.get(sum_mv, 0)  # 該当がなければ0度
+    rotated_img = pg.transform.rotate(base_img, angle)
+    if sum_mv == (0, +5) or (0, -5):
+        rotated_img = pg.transform.flip(rotated_img, True, False)
+    if sum_mv == (-5, 0):
+        rotated_img = pg.transform.flip(rotated_img, False, True)
+
+    return rotated_img
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -120,9 +152,9 @@ def main():
         if not tate: #縦方向にはみ出ていたら
             vy *= -1
         
-        if kk_rct.colliderect(bb_rct): #ゲームオーバー
-            gameover(screen)
-            return
+        # if kk_rct.colliderect(bb_rct): #ゲームオーバー
+        #     gameover(screen)
+        #     return
         
         screen.blit(bb_img, bb_rct)
     
