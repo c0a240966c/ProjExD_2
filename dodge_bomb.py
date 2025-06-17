@@ -4,6 +4,13 @@ import pygame as pg
 
 
 WIDTH, HEIGHT = 1100, 650
+DELTA = {
+    pg.K_UP:    (0, -5),
+    pg.K_DOWN:  (0, +5),
+    pg.K_LEFT:  (-5, 0),
+    pg.K_RIGHT: (+5, 0),
+}
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -24,14 +31,18 @@ def main():
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
-        if key_lst[pg.K_UP]:
-            sum_mv[1] -= 5
-        if key_lst[pg.K_DOWN]:
-            sum_mv[1] += 5
-        if key_lst[pg.K_LEFT]:
-            sum_mv[0] -= 5
-        if key_lst[pg.K_RIGHT]:
-            sum_mv[0] += 5
+        for key, delta in DELTA.items():
+            if key_lst[key]:
+                sum_mv[0] += delta[0]
+                sum_mv[1] += delta[1]
+        # if key_lst[pg.K_UP]:
+        #     sum_mv[1] -= 5
+        # if key_lst[pg.K_DOWN]:
+        #     sum_mv[1] += 5
+        # if key_lst[pg.K_LEFT]:
+        #     sum_mv[0] -= 5
+        # if key_lst[pg.K_RIGHT]:
+        #     sum_mv[0] += 5
         kk_rct.move_ip(sum_mv)
         screen.blit(kk_img, kk_rct)
         pg.display.update()
